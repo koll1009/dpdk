@@ -613,7 +613,7 @@ error:
 	return -1;
 }
 
-/*
+/* 扫描pci总线，获取device list
  * Scan the content of the PCI bus, and the devices in the devices
  * list
  */
@@ -626,19 +626,19 @@ pci_scan(void)
 	uint16_t domain;
 	uint8_t bus, devid, function;
 
-	dir = opendir(SYSFS_PCI_DEVICES);
+	dir = opendir(SYSFS_PCI_DEVICES);// /sys/bus/pci/devices
 	if (dir == NULL) {
 		RTE_LOG(ERR, EAL, "%s(): opendir failed: %s\n",
 			__func__, strerror(errno));
 		return -1;
 	}
 
-	while ((e = readdir(dir)) != NULL) {
+	while ((e = readdir(dir)) != NULL) { //遍历pci设备，解析device info
 		if (e->d_name[0] == '.')
 			continue;
 
 		if (parse_pci_addr_format(e->d_name, sizeof(e->d_name), &domain,
-				&bus, &devid, &function) != 0)
+				&bus, &devid, &function) != 0) //解析pci device
 			continue;
 
 		rte_snprintf(dirname, sizeof(dirname), "%s/%s", SYSFS_PCI_DEVICES,
@@ -706,7 +706,7 @@ rte_eal_pci_probe_one_driver(struct rte_pci_driver *dr, struct rte_pci_device *d
 	if (dr->drv_flags & RTE_PCI_DRV_NEED_IGB_UIO)
 		module_name = IGB_UIO_NAME;
 
-	ret = pci_uio_check_module(module_name);
+	ret = pci_uio_check_module(module_name);//检查igb_uio是否已经加载
 	if (ret != 0)
 		rte_exit(1, "The %s module is required by the %s driver\n",
 				module_name, dr->name);
@@ -740,7 +740,7 @@ rte_eal_pci_probe_one_driver(struct rte_pci_driver *dr, struct rte_pci_device *d
 					return -1;
 			}
 			/* map the NIC resources */
-			if (pci_uio_map_resource(dev) < 0)
+			if (pci_uio_map_resource(dev) < 0) 
 				return -1;
 		}
 		/* call the driver devinit() function */

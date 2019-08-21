@@ -222,7 +222,7 @@ eth_igb_dev_init(__attribute__((unused)) struct eth_driver *eth_drv,
 		E1000_DEV_PRIVATE_TO_VFTA(eth_dev->data->dev_private);
 
 	pci_dev = eth_dev->pci_dev;
-	eth_dev->dev_ops = &eth_igb_ops;
+	eth_dev->dev_ops = &eth_igb_ops; 
 	eth_dev->rx_pkt_burst = &eth_igb_recv_pkts;
 	eth_dev->tx_pkt_burst = &eth_igb_xmit_pkts;
 
@@ -235,7 +235,7 @@ eth_igb_dev_init(__attribute__((unused)) struct eth_driver *eth_drv,
 		return 0;
 	}
 
-	hw->hw_addr= (void *)pci_dev->mem_resource.addr;
+	hw->hw_addr= (void *)pci_dev->mem_resource.addr;//设置映射地址
 
 	igb_identify_hardware(eth_dev);
 
@@ -342,6 +342,7 @@ static struct eth_driver rte_igb_pmd = {
 	.dev_private_size = sizeof(struct e1000_adapter),
 };
 
+/* 注册igb的pmd层驱动 */
 int
 rte_igb_pmd_init(void)
 {

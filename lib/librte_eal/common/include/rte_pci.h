@@ -107,9 +107,9 @@ struct rte_pci_addr {
  */
 struct rte_pci_device {
 	TAILQ_ENTRY(rte_pci_device) next;       /**< Next probed PCI device. */
-	struct rte_pci_addr addr;               /**< PCI location. */
+	struct rte_pci_addr addr;               /**< pci地址 PCI location. */
 	struct rte_pci_id id;                   /**< PCI ID. */
-	struct rte_pci_resource mem_resource;   /**< PCI Memory Resource */
+	struct rte_pci_resource mem_resource;   /**< pci设备的内存资源 PCI Memory Resource */
 	struct rte_intr_handle intr_handle;     /**< Interrupt handle */
 };
 

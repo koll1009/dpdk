@@ -385,7 +385,7 @@ static struct pci_driver igbuio_pci_driver = {
 static int __init
 igbuio_pci_init_module(void)
 {
-	return pci_register_driver(&igbuio_pci_driver);
+	return pci_register_driver(&igbuio_pci_driver);//注册pci driver
 }
 
 static void __exit

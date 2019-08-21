@@ -90,7 +90,7 @@ pci_probe_all_drivers(struct rte_pci_device *dev)
 	return -1;
 }
 
-/*
+/* 
  * Scan the content of the PCI bus, and call the devinit() function for
  * all registered drivers that have a matching entry in its id_table
  * for discovered devices.

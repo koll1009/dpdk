@@ -237,8 +237,8 @@ rte_eth_dev_init(struct rte_pci_driver *pci_drv,
 void
 rte_eth_driver_register(struct eth_driver *eth_drv)
 {
-	eth_drv->pci_drv.devinit = rte_eth_dev_init;
-	rte_eal_pci_register(&eth_drv->pci_drv);
+	eth_drv->pci_drv.devinit = rte_eth_dev_init; //设置device init function
+	rte_eal_pci_register(&eth_drv->pci_drv);//把driver插入到链表中
 }
 
 uint8_t
