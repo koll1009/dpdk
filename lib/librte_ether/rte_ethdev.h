@@ -729,7 +729,7 @@ struct eth_dev_ops {
 	fdir_set_masks_t fdir_set_masks;
 };
 
-/**
+/** 网卡设备用户空间映射的核心描述符，记录了设备信息、驱动信息、收发函数 .etc
  * The generic data structure associated with each ethernet device.
  *
  * Pointers to burst-oriented packet receive and transmit functions are

@@ -210,6 +210,7 @@ igb_identify_hardware(struct rte_eth_dev *dev)
 	/* need to check if it is a vf device below */
 }
 
+/* igb设备的初始化操作 */
 static int
 eth_igb_dev_init(__attribute__((unused)) struct eth_driver *eth_drv,
 		   struct rte_eth_dev *eth_dev)
@@ -222,7 +223,7 @@ eth_igb_dev_init(__attribute__((unused)) struct eth_driver *eth_drv,
 		E1000_DEV_PRIVATE_TO_VFTA(eth_dev->data->dev_private);
 
 	pci_dev = eth_dev->pci_dev;
-	eth_dev->dev_ops = &eth_igb_ops; 
+	eth_dev->dev_ops = &eth_igb_ops; //设置设备的操作函数表
 	eth_dev->rx_pkt_burst = &eth_igb_recv_pkts;
 	eth_dev->tx_pkt_burst = &eth_igb_xmit_pkts;
 

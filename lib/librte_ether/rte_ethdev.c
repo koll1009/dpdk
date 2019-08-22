@@ -171,6 +171,7 @@ rte_eth_dev_allocate(void)
 	return eth_dev;
 }
 
+//
 static int
 rte_eth_dev_init(struct rte_pci_driver *pci_drv,
 		 struct rte_pci_device *pci_dev)
@@ -189,7 +190,7 @@ rte_eth_dev_init(struct rte_pci_driver *pci_drv,
 	if (rte_eal_process_type() == RTE_PROC_PRIMARY){
 		eth_dev->data->dev_private = rte_zmalloc("ethdev private structure",
 				  eth_drv->dev_private_size,
-				  CACHE_LINE_SIZE);
+				  CACHE_LINE_SIZE);//创建private data,不通的网卡驱动利用该字段实现多态化
 		if (eth_dev->data->dev_private == NULL)
 			return -ENOMEM;
 	}
@@ -206,7 +207,7 @@ rte_eth_dev_init(struct rte_pci_driver *pci_drv,
 	eth_dev->data->max_frame_size = ETHER_MAX_LEN;
 
 	/* Invoke PMD device initialization function */
-	diag = (*eth_drv->eth_dev_init)(eth_drv, eth_dev);
+	diag = (*eth_drv->eth_dev_init)(eth_drv, eth_dev);//调用驱动自己的初始化函数
 	if (diag == 0)
 		return (0);
 

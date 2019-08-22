@@ -99,8 +99,8 @@
 struct uio_resource {
 	TAILQ_ENTRY(uio_resource) next;
 
-	struct rte_pci_addr pci_addr;
-	void *addr;
+	struct rte_pci_addr pci_addr;//pci地址,类似0000:00:03.0
+	void *addr;//映射到用户空间的虚拟地址
 	char path[PATH_MAX];
 	unsigned long size;
 	unsigned long offset;
@@ -740,7 +740,7 @@ rte_eal_pci_probe_one_driver(struct rte_pci_driver *dr, struct rte_pci_device *d
 					return -1;
 			}
 			/* map the NIC resources */
-			if (pci_uio_map_resource(dev) < 0) 
+			if (pci_uio_map_resource(dev) < 0) //UIO device 内存映射
 				return -1;
 		}
 		/* call the driver devinit() function */
