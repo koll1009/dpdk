@@ -195,7 +195,9 @@ kni_net_config(struct net_device *dev, struct ifmap *map)
 	return 0;
 }
 
-/*
+/* kni interface recv a packet,kernel invokes this func
+ * convert sk_buf in kernel to rte_mbuf and put it into tx queue 
+ * which will be poped in rte_kni_rx_burst
  * Transmit a packet (called by the kernel)
  */
 static int
@@ -233,7 +235,7 @@ kni_net_tx(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	/* dequeue a mbuf from alloc_q */
-	ret = kni_fifo_get(kni->alloc_q, &pkt_pa, 1);
+	ret = kni_fifo_get(kni->alloc_q, &pkt_pa, 1);//convert sk_buff to rte_mbuf
 	if (likely(ret == 1)) {
 		void *data_kva;
 
@@ -278,7 +280,7 @@ drop:
 	return NETDEV_TX_OK;
 }
 
-/*
+/* 常规送往kni的包的处理函数
  * RX: normal working mode
  */
 static void
@@ -293,6 +295,9 @@ kni_net_rx_normal(struct kni_dev *kni)
 	struct net_device *dev = kni->net_dev;
 
 	/* Get the number of free entries in free_q */
+	/* kni thread will invoke this func to process the packets sended to kni interface，
+	 * convert rte_mbuf to sk_buf and put rte_mbuf into free queue to release,so free queue cann't full		
+	 */
 	num_fq = kni_fifo_free_count(kni->free_q);
 	if (num_fq == 0) {
 		/* No room on the free_q, bail out */
