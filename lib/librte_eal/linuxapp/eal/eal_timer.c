@@ -293,13 +293,14 @@ get_tsc_freq(void)
 	return 0;
 }
 
+/* 定时器初始化 */
 int
 rte_eal_timer_init(void)
 {
 
 	eal_timer_source = EAL_TIMER_TSC;
 
-	set_tsc_freq();
-	check_tsc_flags();
+	set_tsc_freq();//工作频率
+	check_tsc_flags();// 检查/proc/cpuinfo文件里记录的flag
 	return 0;
 }

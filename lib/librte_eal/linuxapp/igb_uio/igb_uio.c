@@ -45,7 +45,7 @@
  */
 struct rte_uio_pci_dev {
 	struct uio_info info;
-	struct pci_dev *pdev;
+	struct pci_dev *pdev;//real pci device
 	enum rte_intr_mode mode;
 };
 
@@ -298,6 +298,12 @@ igbuio_setup_bars(struct pci_dev *dev, struct uio_info *info)
 		if (pci_resource_len(dev, i) != 0 &&
 				pci_resource_start(dev, i) != 0) {
 			flags = pci_resource_flags(dev, i);
+
+			/* Memory mapped I/O is mapped into the same address space 
+			 * as program memory and/or user memory, and is accessed in the same way. 
+			 * Port mapped I/O uses a separate, dedicated address space and is accessed 
+			 * via a dedicated set of microprocessor instructions 
+			 */
 			if (flags & IORESOURCE_MEM) {
 				ret = igbuio_pci_setup_iomem(dev, info, iom,
 							     i, bar_names[i]);
@@ -428,7 +434,7 @@ igbuio_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		goto fail_release_iomem;
 
 	/* register uio driver */
-	err = uio_register_device(&dev->dev, &udev->info);
+	err = uio_register_device(&dev->dev, &udev->info);//创建uio device
 	if (err != 0)
 		goto fail_remove_group;
 
@@ -517,16 +523,17 @@ static struct pci_driver igbuio_pci_driver = {
 	.remove = igbuio_pci_remove,
 };
 
+/* igb_uio驱动的init函数 */
 static int __init
 igbuio_pci_init_module(void)
 {
 	int ret;
 
-	ret = igbuio_config_intr_mode(intr_mode);
+	ret = igbuio_config_intr_mode(intr_mode);//设置interrupt mode
 	if (ret < 0)
 		return ret;
 
-	return pci_register_driver(&igbuio_pci_driver);
+	return pci_register_driver(&igbuio_pci_driver);//注册pci bus driver,path /sys/bus/pci/driver
 }
 
 static void __exit
