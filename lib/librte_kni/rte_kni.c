@@ -90,7 +90,7 @@ enum kni_ops_status {
 	KNI_REQ_REGISTERED,
 };
 
-/**
+/** 每个kni interface对应一个，保存了kni context和各类队列
  * KNI memzone pool slot
  */
 struct rte_kni_memzone_slot {
@@ -190,7 +190,7 @@ kni_memzone_pool_release(struct rte_kni_memzone_slot *slot)
 }
 
 
-/* Shall be called before any allocation happens */
+/* Shall be called before any allocation happens,@max_kni_ifaces为初始化分配的kni interface数量 */
 void
 rte_kni_init(unsigned int max_kni_ifaces)
 {
@@ -216,7 +216,7 @@ rte_kni_init(unsigned int max_kni_ifaces)
 
 	/* Check FD and open */
 	if (kni_fd < 0) {
-		kni_fd = open("/dev/" KNI_DEVICE, O_RDWR);
+		kni_fd = open("/dev/" KNI_DEVICE, O_RDWR);//打开kni驱动力注册的misc设备
 		if (kni_fd < 0) {
 			RTE_LOG(ERR, KNI,
 				"Can not open /dev/%s\n", KNI_DEVICE);
@@ -315,7 +315,7 @@ kni_fail:
 		"Increase the amount of hugepages memory\n", max_kni_ifaces);
 }
 
-
+/* 创建kni interface */
 struct rte_kni *
 rte_kni_alloc(struct rte_mempool *pktmbuf_pool,
 	      const struct rte_kni_conf *conf,
@@ -338,7 +338,7 @@ rte_kni_alloc(struct rte_mempool *pktmbuf_pool,
 	}
 
 	/* Get an available slot from the pool */
-	slot = kni_memzone_pool_alloc();
+	slot = kni_memzone_pool_alloc();//取kni slot
 	if (!slot) {
 		RTE_LOG(ERR, KNI, "Cannot allocate more KNI interfaces; increase the number of max_kni_ifaces(current %d) or release unusued ones.\n",
 			kni_memzone_pool.max_ifaces);
@@ -357,6 +357,7 @@ rte_kni_alloc(struct rte_mempool *pktmbuf_pool,
 	if (ops)
 		memcpy(&ctx->ops, ops, sizeof(struct rte_kni_ops));
 
+	//set kni info
 	memset(&dev_info, 0, sizeof(dev_info));
 	dev_info.bus = conf->addr.bus;
 	dev_info.devid = conf->addr.devid;
@@ -421,7 +422,7 @@ rte_kni_alloc(struct rte_mempool *pktmbuf_pool,
 	ctx->slot_id = slot->id;
 	ctx->mbuf_size = conf->mbuf_size;
 
-	ret = ioctl(kni_fd, RTE_KNI_IOCTL_CREATE, &dev_info);
+	ret = ioctl(kni_fd, RTE_KNI_IOCTL_CREATE, &dev_info);//调用misc设备的ioctl函数，完成虚拟网卡的创建
 	KNI_MEM_CHECK(ret < 0);
 
 	ctx->in_use = 1;
@@ -608,6 +609,7 @@ kni_free_mbufs(struct rte_kni *kni)
 	}
 }
 
+/* 提前分配一些rte_mbuf */
 static void
 kni_allocate_mbufs(struct rte_kni *kni)
 {

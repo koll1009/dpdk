@@ -175,11 +175,12 @@ kni_thread_multiple(void *param)
 	return 0;
 }
 
+/* kni_init里定义的misc device的文件操作函数 - open */
 static int
 kni_open(struct inode *inode, struct file *file)
 {
 	struct net *net = current->nsproxy->net_ns;
-	struct kni_net *knet = net_generic(net, kni_net_id);
+	struct kni_net *knet = net_generic(net, kni_net_id);//获取device的private data
 
 	/* kni device can be opened by one user only per netns */
 	if (test_and_set_bit(KNI_DEV_IN_USE_BIT_NUM, &knet->device_in_use))
@@ -310,6 +311,7 @@ kni_run_thread(struct kni_net *knet, struct kni_dev *kni, uint8_t force_bind)
 	return 0;
 }
 
+/* misc设备ioctl函数create option对应的操作 */
 static int
 kni_ioctl_create(struct net *net, uint32_t ioctl_num,
 		unsigned long ioctl_param)
@@ -365,7 +367,7 @@ kni_ioctl_create(struct net *net, uint32_t ioctl_num,
 #ifdef NET_NAME_USER
 							NET_NAME_USER,
 #endif
-							kni_net_init);
+							kni_net_init);//创建网络设备
 	if (net_dev == NULL) {
 		pr_err("error allocating device \"%s\"\n", dev_info.name);
 		return -EBUSY;
@@ -599,6 +601,7 @@ kni_parse_kthread_mode(void)
 	return 0;
 }
 
+/* 驱动加载时调用 */
 static int __init
 kni_init(void)
 {
@@ -615,14 +618,14 @@ kni_init(void)
 		pr_debug("Multiple kernel thread mode enabled\n");
 
 #ifdef HAVE_SIMPLIFIED_PERNET_OPERATIONS
-	rc = register_pernet_subsys(&kni_net_ops);
+	rc = register_pernet_subsys(&kni_net_ops);// A way to get notified by network core when network namespace created or destroyed.The id and size define the private data used by this module.
 #else
 	rc = register_pernet_gen_subsys(&kni_net_id, &kni_net_ops);
 #endif
 	if (rc)
 		return -EPERM;
 
-	rc = misc_register(&kni_misc);
+	rc = misc_register(&kni_misc);//注册/dev/kni 设备
 	if (rc != 0) {
 		pr_err("Misc registration failed\n");
 		goto out;
