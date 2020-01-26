@@ -233,7 +233,7 @@ igbuio_pci_setup_iomem(struct pci_dev *dev, struct uio_info *info,
 	len = pci_resource_len(dev, pci_bar);
 	if (addr == 0 || len == 0)
 		return -1;
-	internal_addr = ioremap(addr, len);
+	internal_addr = ioremap(addr, len);//ioremap is used to map physical memory into virtual address space of the kernel
 	if (internal_addr == NULL)
 		return -1;
 	info->mem[n].name = name;
@@ -255,6 +255,7 @@ igbuio_pci_release_iomem(struct uio_info *info)
 	}
 }
 
+/* 网卡绑定igb_uio时触发 */
 static int __devinit
 igbuio_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
@@ -336,7 +337,7 @@ igbuio_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		break;
 	}
 
-	pci_set_drvdata(dev, udev);
+	pci_set_drvdata(dev, udev);//set data of driver
 	igbuio_pci_irqcontrol(&udev->info, 0);
 
 	/* register uio driver */
@@ -385,7 +386,7 @@ static struct pci_driver igbuio_pci_driver = {
 static int __init
 igbuio_pci_init_module(void)
 {
-	return pci_register_driver(&igbuio_pci_driver);//注册pci driver
+	return pci_register_driver(&igbuio_pci_driver);//加载igb_uio.ko模块时，注册driver
 }
 
 static void __exit

@@ -633,17 +633,17 @@ pci_scan(void)
 		return -1;
 	}
 
-	while ((e = readdir(dir)) != NULL) { //遍历pci设备，解析device info
+	while ((e = readdir(dir)) != NULL) { //遍历pci设备解析
 		if (e->d_name[0] == '.')
 			continue;
 
 		if (parse_pci_addr_format(e->d_name, sizeof(e->d_name), &domain,
-				&bus, &devid, &function) != 0) //解析pci device
+				&bus, &devid, &function) != 0) //pci device name consists of domain:bus:devid:function
 			continue;
 
 		rte_snprintf(dirname, sizeof(dirname), "%s/%s", SYSFS_PCI_DEVICES,
 			 e->d_name);
-		if (pci_scan_one(dirname, domain, bus, devid, function) < 0)
+		if (pci_scan_one(dirname, domain, bus, devid, function) < 0) 
 			goto error;
 	}
 	closedir(dir);
@@ -762,7 +762,7 @@ rte_eal_pci_init(void)
 	if (internal_config.no_pci)
 		return 0;
 
-	if (pci_scan() < 0) {
+	if (pci_scan() < 0) { //scan pci device
 		RTE_LOG(ERR, EAL, "%s(): Cannot scan PCI bus\n", __func__);
 		return -1;
 	}
