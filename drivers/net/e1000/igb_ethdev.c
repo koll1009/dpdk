@@ -787,7 +787,7 @@ eth_igb_dev_init(struct rte_eth_dev *eth_dev)
 	rte_eth_copy_pci_info(eth_dev, pci_dev);
 	eth_dev->data->dev_flags |= RTE_ETH_DEV_DETACHABLE;
 
-	hw->hw_addr= (void *)pci_dev->mem_resource[0].addr;
+	hw->hw_addr= (void *)pci_dev->mem_resource[0].addr;//addr即为uio map到user space的地址
 
 	igb_identify_hardware(eth_dev, pci_dev);
 	if (e1000_setup_init_funcs(hw, FALSE) != E1000_SUCCESS) {
@@ -1326,10 +1326,10 @@ eth_igb_start(struct rte_eth_dev *dev)
 	/* Configure for OS presence */
 	igb_init_manageability(hw);
 
-	eth_igb_tx_init(dev);
+	eth_igb_tx_init(dev);//初始化发送队列
 
 	/* This can fail when allocating mbufs for descriptor rings */
-	ret = eth_igb_rx_init(dev);
+	ret = eth_igb_rx_init(dev); //初始化接收队列
 	if (ret) {
 		PMD_INIT_LOG(ERR, "Unable to initialize RX hardware");
 		igb_dev_clear_queues(dev);

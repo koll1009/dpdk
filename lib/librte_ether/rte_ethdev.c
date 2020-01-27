@@ -1048,6 +1048,7 @@ rte_eth_rx_queue_setup(uint8_t port_id, uint16_t rx_queue_id,
 		return -EINVAL;
 	}
 
+	/* 接收queue有长度限制,要检查参数是否合适 */
 	if (nb_rx_desc > dev_info.rx_desc_lim.nb_max ||
 			nb_rx_desc < dev_info.rx_desc_lim.nb_min ||
 			nb_rx_desc % dev_info.rx_desc_lim.nb_align != 0) {
@@ -1073,7 +1074,7 @@ rte_eth_rx_queue_setup(uint8_t port_id, uint16_t rx_queue_id,
 		rx_conf = &dev_info.default_rxconf;
 
 	ret = (*dev->dev_ops->rx_queue_setup)(dev, rx_queue_id, nb_rx_desc,
-					      socket_id, rx_conf, mp);
+					      socket_id, rx_conf, mp);//调用驱动的相应setup函数
 	if (!ret) {
 		if (!dev->data->min_rx_buf_size ||
 		    dev->data->min_rx_buf_size > mbp_buf_size)
@@ -1809,6 +1810,7 @@ rte_eth_dev_fw_version_get(uint8_t port_id, char *fw_version, size_t fw_size)
 	return (*dev->dev_ops->fw_version_get)(dev, fw_version, fw_size);
 }
 
+/* get info of network interface */
 void
 rte_eth_dev_info_get(uint8_t port_id, struct rte_eth_dev_info *dev_info)
 {
@@ -1859,6 +1861,7 @@ rte_eth_dev_get_supported_ptypes(uint8_t port_id, uint32_t ptype_mask,
 	return j;
 }
 
+/* 取mac地址 */
 void
 rte_eth_macaddr_get(uint8_t port_id, struct ether_addr *mac_addr)
 {

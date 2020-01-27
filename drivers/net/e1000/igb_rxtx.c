@@ -582,7 +582,7 @@ eth_igb_xmit_pkts(void *tx_queue, struct rte_mbuf **tx_pkts,
 			txd = &txr[tx_id];
 
 			if (txe->mbuf != NULL)
-				rte_pktmbuf_free_seg(txe->mbuf);
+				rte_pktmbuf_free_seg(txe->mbuf);//free mbuf
 			txe->mbuf = m_seg;
 
 			/*
@@ -1599,6 +1599,7 @@ igb_reset_rx_queue(struct igb_rx_queue *rxq)
 	rxq->pkt_last_seg = NULL;
 }
 
+/* 接收网络包队列的setup函数 */
 int
 eth_igb_rx_queue_setup(struct rte_eth_dev *dev,
 			 uint16_t queue_idx,
@@ -1660,7 +1661,7 @@ eth_igb_rx_queue_setup(struct rte_eth_dev *dev,
 	 */
 	size = sizeof(union e1000_adv_rx_desc) * E1000_MAX_RING_DESC;
 	rz = rte_eth_dma_zone_reserve(dev, "rx_ring", queue_idx, size,
-				      E1000_ALIGN, socket_id);
+				      E1000_ALIGN, socket_id);//分配内存
 	if (rz == NULL) {
 		igb_rx_queue_release(rxq);
 		return -ENOMEM;
@@ -2180,7 +2181,7 @@ igb_alloc_rx_queue_mbufs(struct igb_rx_queue *rxq)
 			return -ENOMEM;
 		}
 		dma_addr =
-			rte_cpu_to_le_64(rte_mbuf_data_dma_addr_default(mbuf));
+			rte_cpu_to_le_64(rte_mbuf_data_dma_addr_default(mbuf));//指向mbuf中的packet buf部分
 		rxd = &rxq->rx_ring[i];
 		rxd->read.hdr_addr = 0;
 		rxd->read.pkt_addr = dma_addr;
@@ -2279,7 +2280,7 @@ eth_igb_rx_init(struct rte_eth_dev *dev)
 		rxq = dev->data->rx_queues[i];
 
 		/* Allocate buffers for descriptor rings and set up queue */
-		ret = igb_alloc_rx_queue_mbufs(rxq);
+		ret = igb_alloc_rx_queue_mbufs(rxq);//分配网络包的接收内存
 		if (ret)
 			return ret;
 
