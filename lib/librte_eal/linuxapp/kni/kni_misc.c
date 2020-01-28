@@ -601,13 +601,13 @@ kni_parse_kthread_mode(void)
 	return 0;
 }
 
-/* 驱动加载时调用 */
+/* kni驱动加载时调用 */
 static int __init
 kni_init(void)
 {
 	int rc;
 
-	if (kni_parse_kthread_mode() < 0) {
+	if (kni_parse_kthread_mode() < 0) { //设置多线程or单线程
 		pr_err("Invalid parameter for kthread_mode\n");
 		return -EINVAL;
 	}
